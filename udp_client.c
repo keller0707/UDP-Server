@@ -37,6 +37,7 @@ int main(int argc, char **argv[]){
 	//Set Port
 	int port = 9002;                                          //Default Port
 	if(argc == 4) port = strtol((char *)argv[2], NULL, 10);   //Set Port
+	printf("Port: %d\n", port);
 
 	//Create Socket
 	int network_socket;
@@ -46,7 +47,8 @@ int main(int argc, char **argv[]){
 	if(network_socket == -1){
 		perror("Failed to create socket");
 		exit(EXIT_FAILURE);
-	}//End if
+	}else printf("Socket Successfully Created!\n");
+	//End if
 
 	//Specify an address for the socket
 	struct sockaddr_in server_address;
@@ -54,18 +56,22 @@ int main(int argc, char **argv[]){
 	server_address.sin_port        = htons(port);   //Convert Port #
 	server_address.sin_addr.s_addr = INADDR_ANY;    //Send Address
 
+	
 	//Send Message to Server
-	char * msg = "Hello From Client!";                                                                                                       //Create MSG
-	int len = sendto(network_socket, (const char *)msg, strlen(msg), 0, (const struct sockaddr *)&server_address, sizeof(server_address));   //Send MSG
-	if(len != -1) printf("Message sent to Server!");                                                                                         //Check if sent
+	//char * msg = "Hello From Client!";     
+	printf("File Name: %s\n",argv[3]);                                                                                                  //Create MSG
+	int message_sent = sendto(network_socket, (const char *)argv[3], strlen((char *)argv[3]), 0, (struct sockaddr *)&server_address, sizeof(server_address));   //Send MSG
+	if(message_sent != -1) printf("Message sent to Server!");                                                                                         //Check if sent
 	else perror("Fail to send");
- 
+ 	
+	
 	//Receive Message from Server
-	char buffer[50] = {0};
-	socklen_t lens = 0;                                                                 //Set data length 
-	int receive = recvfrom(network_socket, buffer, 50, 0, (struct sockaddr *)&server_address, &lens);   //Get data
-	if(receive == -1) perror("Failed to receive message");
-	else printf("Received Message\n");
+	char buffer[200];
+	socklen_t lens = 0;
+	int receive = recv(network_socket, &buffer, sizeof(buffer), 0); 
+	//int receive = recvfrom(network_socket, (char *)buffer, 200, 0, (struct sockaddr *)&server_address, &lens);   //Get data
+	//if(receive == -1) perror("Failed to receive message");
+	//else printf("Received Message\n");
 	buffer[receive] = '\0';                                                            //Add space to message
 	printf("Message: %s", buffer);                                                     //Print Msg
 
