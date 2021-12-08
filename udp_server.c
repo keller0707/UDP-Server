@@ -34,7 +34,8 @@ int main(int argc, char *argv[]){
 	//argv[2] = port #
 	
 	//Create port #
-	
+	int port = 9002;                // Set Default Port
+	if(argc == 3) port = argv[2];   // User's Port
 
 	//Data we want to send to client
 	char server_message[256] = "You reach the server!";
@@ -52,7 +53,7 @@ int main(int argc, char *argv[]){
    	//Specify the Server Address
 	struct sockaddr_in server_address;
 	server_address.sin_family      = AF_INET;
-	server_address.sin_port        = htons(9002);
+	server_address.sin_port        = htons(port);
 	server_address.sin_addr.s_addr = INADDR_ANY;	
 
 	//Bind Socket
@@ -65,8 +66,8 @@ int main(int argc, char *argv[]){
 	}//End if
 
 	socklen_t len = 0;
-	int n = recvfrom(server_socket, (char *)buffer, 50, MSG_WAITALL, 0, &len);
-	buffer[n] = '\n';
+	int receive = recvfrom(server_socket, (char *)buffer, 50, MSG_WAITALL, 0, &len);
+	buffer[receive] = '\n';
 	printf("Message: %s", buffer);
 
 	

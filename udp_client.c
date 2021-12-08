@@ -27,7 +27,17 @@
 #include <arpa/inet.h>
 
 //Main
-int main(){
+int main(int argc, char *argv[]){
+	//Expected Argument input
+	//argv[0] = name of program
+	//argv[1] = IP or Hostname
+	//argv[2] = Port #
+	//argv[3] = File Name
+	
+	//Set Port
+	int port = 9002;                //Default Port
+	if(argc == 4) port = argv[2];   //Set Port
+
 	//Message from Client
 	char * msg = "Hello From Client";
 
@@ -44,7 +54,7 @@ int main(){
 	//Specify an address for the socket
 	struct sockaddr_in server_address;
 	server_address.sin_family      = AF_INET;       //Type of Address
-	server_address.sin_port        = htons(9002);   //Convert Port #
+	server_address.sin_port        = htons(port);   //Convert Port #
 	server_address.sin_addr.s_addr = INADDR_ANY;    //Send Address
 
 	int len = sendto(network_socket, (const char *)msg, strlen(msg), 0, (const struct sockaddr *)&server_address, sizeof(server_address));
