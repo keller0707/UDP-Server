@@ -27,7 +27,15 @@
 #include <arpa/inet.h>
 
 //Main
-int main(){
+int main(int argc, char *argv[]){
+	//Expected Argument input
+	//argv[0] = name of program
+	//argv[1] = name of file
+	//argv[2] = port #
+	
+	//Create port #
+	
+
 	//Data we want to send to client
 	char server_message[256] = "You reach the server!";
 	
@@ -57,18 +65,18 @@ int main(){
 	}//End if
 
 	socklen_t len = 0;
-	int n = recvfrom(server_socket, (char*)buffer, 50, MSG_WAITALL, 0, &len);
+	int n = recvfrom(server_socket, (char *)buffer, 50, MSG_WAITALL, 0, &len);
 	buffer[n] = '\n';
-	printf("%s", buffer);
+	printf("Message: %s", buffer);
 
+	
 	/*
-
 	//Listen on the socket
-	listen(server_socket, 5);
-	//if(listen == -1){
-	//	perror("Listen Failed");
-	//	exit(EXIT_FAILURE);
-	//}//End if
+	int listen_socket = listen(server_socket, 5);
+	if(listen_socket == -1){
+		perror("Listen Failed");
+		exit(EXIT_FAILURE);
+	}//End if
 
 	//Create Client Socket
 	int client_socket;
