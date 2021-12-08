@@ -24,44 +24,61 @@
 //Extra Libraries
 #include <unistd.h>
 #include <string.h>
-#include <arpa.inet.h>
+#include <arpa/inet.h>
 
 //Main
 int main(){
-	//Message from Client
-	char * msg = "Hello From Client";
-
-	//Create Socket
-	int network_socket;
-	network_socket = socket(AF_INET, SOCK_DGRAM, 0);
-
-	//Check to see if socket is created.
-	if(network_socket == -1){
+	//Data we want to send to client
+	char server_message[256] = "You reach the server!";
+	
+	//Create Server Socket
+	char buffer[50] = {0};
+	int server_socket = socket(AF_INET, SOCK_DGRAM, 0);
+		
+	//Check Socket
+	if(server_socket == -1){
 		perror("Failed to create socket");
 		exit(EXIT_FAILURE);
 	}//End if
 
-	//Specify an address for the socket
+   	//Specify the Server Address
 	struct sockaddr_in server_address;
 	server_address.sin_family      = AF_INET;
 	server_address.sin_port        = htons(9002);
-	server_address.sin_addr.s_addr = INADDR_ANY;
+	server_address.sin_addr.s_addr = INADDR_ANY;	
 
-	//Create Connection
-	int connection_status = connect(network_socket, (struct sockaddr *) &server_address, sizeof(server_address));
+	//Bind Socket
+	int bind_socket = bind(server_socket, (struct sockaddr*) &server_address, sizeof(server_address));
 
-	//Check for errors with the connection
-	if(connection_status == -1){
-		perror("Failed to creat connection to the remote socket");
+	if(bind_socket == -1){
+		perror("Bind Failed");
+		close(server_socket);
 		exit(EXIT_FAILURE);
 	}//End if
 
-	//Recieve Data from Server
-	char server_response[256];                                            //Store Server Data
-	recv(network_socket, &server_response, sizeof(server_response), 0);   //Recieve Data
-	printf("The server sent the data: %s", server_response);              //Print Data
+	socklen_t len = 0;
+	int n = recvfrom(server_socket, (char*)buffer, 50, MSG_WAITALL, 0, &len);
+	buffer[n] = '\n';
+	printf("%s", buffer);
 
-	//Close the Socket
-	close(sock);
+	/*
+
+	//Listen on the socket
+	listen(server_socket, 5);
+	//if(listen == -1){
+	//	perror("Listen Failed");
+	//	exit(EXIT_FAILURE);
+	//}//End if
+
+	//Create Client Socket
+	int client_socket;
+	client_socket = accept(server_socket, NULL, NULL);
+
+	//Send Data
+	send(client_socket, server_message, sizeof(server_message), 0);*/
+
+	//Close Socket
+	close(server_socket);
+
 	return 0;
 }//End main

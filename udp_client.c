@@ -24,7 +24,7 @@
 //Extra Libraries
 #include <unistd.h>
 #include <string.h>
-#include <arpa.inet.h>
+#include <arpa/inet.h>
 
 //Main
 int main(){
@@ -43,9 +43,9 @@ int main(){
 
 	//Specify an address for the socket
 	struct sockaddr_in server_address;
-	server_address.sin_family      = AF_INET;
-	server_address.sin_port        = htons(9002);
-	server_address.sin_addr.s_addr = INADDR_ANY;
+	server_address.sin_family      = AF_INET;       //Type of Address
+	server_address.sin_port        = htons(9002);   //Convert Port #
+	server_address.sin_addr.s_addr = INADDR_ANY;    //Send Address
 
 	//Create Connection
 	int connection_status = connect(network_socket, (struct sockaddr *) &server_address, sizeof(server_address));
@@ -61,7 +61,10 @@ int main(){
 	recv(network_socket, &server_response, sizeof(server_response), 0);   //Recieve Data
 	printf("The server sent the data: %s", server_response);              //Print Data
 
+	//Send Data to Server
+	//int 
+
 	//Close the Socket
-	close(sock);
+	close(network_socket);
 	return 0;
 }//End main
