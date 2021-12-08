@@ -27,7 +27,7 @@
 #include <arpa/inet.h>
 
 //Main
-int main(int argc, char *argv[]){
+int main(int argc, char **argv[]){
 	//Expected Argument input
 	//argv[0] = name of program
 	//argv[1] = IP or Hostname
@@ -35,11 +35,8 @@ int main(int argc, char *argv[]){
 	//argv[3] = File Name
 	
 	//Set Port
-	int port = 9002;                //Default Port
-	if(argc == 4) port = argv[2];   //Set Port
-
-	//Message from Client
-	char * msg = "Hello From Client";
+	int port = 9002;                                          //Default Port
+	if(argc == 4) port = strtol((char *)argv[2], NULL, 10);   //Set Port
 
 	//Create Socket
 	int network_socket;
@@ -57,10 +54,21 @@ int main(int argc, char *argv[]){
 	server_address.sin_port        = htons(port);   //Convert Port #
 	server_address.sin_addr.s_addr = INADDR_ANY;    //Send Address
 
-	int len = sendto(network_socket, (const char *)msg, strlen(msg), 0, (const struct sockaddr *)&server_address, sizeof(server_address));
-	if(len == -1){
-		perror("Fail to send");
-	}//end if
+	//Send Message to Server
+	char * msg = "Hello From Client!";                                                                                                       //Create MSG
+	int len = sendto(network_socket, (const char *)msg, strlen(msg), 0, (const struct sockaddr *)&server_address, sizeof(server_address));   //Send MSG
+	if(len != -1) printf("Message sent to Server!");                                                                                         //Check if sent
+	else perror("Fail to send");
+ 
+	//Receive Message from Server
+	char buffer[50] = {0};
+	socklen_t lens = 0;                                                                 //Set data length 
+	int receive = recvfrom(network_socket, buffer, 50, 0, (struct sockaddr *)&server_address, &lens);   //Get data
+	if(receive == -1) perror("Failed to receive message");
+	else printf("Received Message\n");
+	buffer[receive] = '\0';                                                            //Add space to message
+	printf("Message: %s", buffer);                                                     //Print Msg
+
 
 	/*
 	//Create Connection
@@ -70,17 +78,20 @@ int main(int argc, char *argv[]){
 	if(connection_status == -1){
 		perror("Failed to creat connection to the remote socket");
 		exit(EXIT_FAILURE);
-	}//End if
+	}//End if*/
+
+	/*
 
 	//Recieve Data from Server
 	char server_response[256];                                            //Store Server Data
+	(struct sockaddr*) &server_address, sizeof(server_address)
 	recv(network_socket, &server_response, sizeof(server_response), 0);   //Recieve Data
-	printf("The server sent the data: %s", server_response);              //Print Data
+	printf("The server sent the data: %s", server_response);              //Print Data*/
 
 	//Send Data to Server
 	//int 
 
-	*/
+	
 	//Close the Socket
 	close(network_socket);
 	return 0;

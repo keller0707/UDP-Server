@@ -34,11 +34,8 @@ int main(int argc, char *argv[]){
 	//argv[2] = port #
 	
 	//Create port #
-	int port = 9002;                // Set Default Port
-	if(argc == 3) port = argv[2];   // User's Port
-
-	//Data we want to send to client
-	char server_message[256] = "You reach the server!";
+	int port = 9002;                     // Set Default Port
+	if(argc == 3) port = strtol((char*)argv[2], NULL, 10);   // User's Port
 	
 	//Create Server Socket
 	char buffer[50] = {0};
@@ -65,12 +62,21 @@ int main(int argc, char *argv[]){
 		exit(EXIT_FAILURE);
 	}//End if
 
-	socklen_t len = 0;
-	int receive = recvfrom(server_socket, (char *)buffer, 50, MSG_WAITALL, 0, &len);
-	buffer[receive] = '\n';
-	printf("Message: %s", buffer);
+	//Receive Message from Client
+	socklen_t len = 0;                                                                 //Set data length 
+	int receive = recvfrom(server_socket, (char *)buffer, 50, MSG_WAITALL, 0, &len);   //Get data
+	buffer[receive] = '\n';                                                            //Add space to message
+	printf("Message: %s", buffer);                                                     //Print Msg
 
-	
+	//Send Message to Client
+	char * server_message = "You reach the server!";                                                             //Data to send
+	int sent = sendto(server_socket, (const char *)server_message, strlen(server_message), 0, (const struct sockaddr*) &server_address, sizeof(server_address));   //Send MSG
+	if(sent != -1)printf("Message Sent!\n");                                                                          //Check sent
+	else{
+		perror("Message failed to send");               
+	}//End ifElse
+
+
 	/*
 	//Listen on the socket
 	int listen_socket = listen(server_socket, 5);
