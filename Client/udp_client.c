@@ -68,17 +68,18 @@ int main(int argc, char **argv[]){
 	socklen_t len = 0;                                                                   // Create length
         int receive = recvfrom(network_socket, (char *)buffer, 200, MSG_WAITALL, 0, &len);   // Receive Data 
 	if(receive == -1) perror("Fail to receive package");	                             // Print Error
-	printf("Message:\n%s", buffer);                                                      // Print Message
+	printf("Message:\n%s\n", buffer);                                                      // Print Message
 
 	//Create File
 	FILE *file;
 	file = fopen((char *)argv[3], "w");
 
 	//Write the File
-	fputs((char *)buffer, file);
-	//for(int i = 0; i < sizeof(buffer); i++){
-	//	fputc();
-	//}//End for
+	//fputs((char *)buffer, file);
+	for(int i = 0; i < sizeof(buffer); i++){
+		if(buffer[i] == EOF) break;
+		fputc(buffer[i], file);
+	}//End for
 
 	//Close File
 	fclose(file);

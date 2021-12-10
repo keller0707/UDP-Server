@@ -94,7 +94,7 @@ int main(int argc, char *argv[]){
         	for (int i = 0; i < sizeof(buffer); i++){   // Loop through buffer
 			buffer[i] = fgetc(file);            // Save string
             		if (buffer[i] == EOF){              // Check EOF (End Of File)
-				buffer[i] = '\0';           // Set the End to empty
+				//buffer[i] = '\0';           // Set the End to empty
 			       	EndOfFile = -1;             // Update Flag
 				break;                      // Break Loop
 			}//End if
