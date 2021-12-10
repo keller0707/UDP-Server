@@ -61,54 +61,56 @@ int main(int argc, char *argv[]){
 	printf("Listening for Clients...\n");                                                                // Print listening
 
 	//Receive file name from client 
-	char buffer[50] = {0}; 
-	int receive;
-    	socklen_t len = sizeof(server_address);
-    	receive = recvfrom(server_socket, (char*)buffer, sizeof(buffer), MSG_WAITALL, (struct sockaddr*)&server_address, &len);
-    
+	char buffer[200] = {0};                                                                                                   // Create Buffer
+	int receive;                                                                                                              //
+    	socklen_t len = sizeof(server_address);                                                                                   // Set Length
+    	receive = recvfrom(server_socket, (char*)buffer, sizeof(buffer), MSG_WAITALL, (struct sockaddr*)&server_address, &len);   // receive file
+    	if(receive != 1) printf("Received message from client!\n");                                                               // Print Success
+	else perror("Failed to received");                                                                                        // Print Failure
+
+	/*** File Reader ***/
     	// Try to open file
     	FILE* file = fopen(buffer, "r");
     
     	//Print file name
     	buffer[receive] = '\n';
     	printf("File Name Received: %s", buffer);
+	memset(&buffer, 0, sizeof(buffer));
     
-    	//Did file open succesfully?
+    	//Checks if File exists.
     	if (file == NULL)
-     		printf("Failed to open file!\n");
+     		perror("ERROR: File does not exit.\n");
     	else
-        	perror("File opened successfully!");
+        	printf("File opened successfully!\n");
     
     	//Send File
-    	int EndOfFile = 0; //flag to see if EOF has been reached
-    	int sent;
+    	int EndOfFile = 1;   // Flag to see if EOF has been reached
+    	int sent;            // Flag for sendto
 
 
-    	while (1) {
-        	//process
-        	for (int i = 0; i < sizeof(buffer); i++){     
-            		buffer[i] = fgetc(file);
-            		if (buffer[i] == EOF){
-			       	EndOfFile = 1;
-				break;
-			}
-        	}
-        	sent = sendto(server_socket, (const char *)buffer, strlen(buffer), 0, (struct sockaddr*) &server_address, len);
-            
-        //End While
-        
-        //Exit loop if EOF
-        if (EndOfFile) break;
-        
+	//Proccess and send file
+    	while (EndOfFile != -1) {
+        	//Proccess the File
+        	for (int i = 0; i < sizeof(buffer); i++){   // Loop through buffer
+			buffer[i] = fgetc(file);            // Save string
+            		if (buffer[i] == EOF){              // Check EOF (End Of File)
+				buffer[i] = '\0';           // Set the End to empty
+			       	EndOfFile = -1;             // Update Flag
+				break;                      // Break Loop
+			}//End if
+        	}//End for
+
+		//Send file to Client
+        	sent = sendto(server_socket, (const char *)buffer, strlen(buffer), 0, (struct sockaddr*) &server_address, len);   // Send Packet
+		if(sent != -1) printf("Sent Packet Successfull!\n");                                                              // Print Success
+		else perror("Failed to send packet!\n");                                                                          // Print Failure
     	}//while
     
     	// Close File
-    	if (file != NULL)
-        	fclose(file);
+    	fclose(file);
 
 	//Close Socket
 	close(server_socket);
 
-	
 	return 0;
 }//End main
