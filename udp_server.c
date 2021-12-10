@@ -45,10 +45,11 @@ int main(int argc, char *argv[]){
 	}else printf("Socket successfully Created!\n");       // Print Success
 
    	//Specify the Server Address
-	struct sockaddr_in server_address;
-	server_address.sin_family      = AF_INET;       // Type of Address
-	server_address.sin_port        = htons(port);   // Convert Port #
-	server_address.sin_addr.s_addr = INADDR_ANY;	// Send Address
+	struct sockaddr_in server_address;                    // Create Stuct
+	memset(&server_address, 0, sizeof(server_address));   // Clear Memory
+	server_address.sin_family      = AF_INET;             // Type of Address
+	server_address.sin_port        = htons(port);         // Convert Port #
+	server_address.sin_addr.s_addr = INADDR_ANY;	      // Send Address
 
 	//Bind Socket
 	int bind_socket = bind(server_socket, (struct sockaddr*) &server_address, sizeof(server_address));   // Bind Socket
@@ -60,43 +61,39 @@ int main(int argc, char *argv[]){
 	printf("Listening for Clients...\n");                                                                // Print listening
 
 	//Receive file name from client 
-	char buffer[50] = {0};
-    	socklen_t len = 0;
-    	int n = recvfrom(server_socket, (char *)buffer, 50, MSG_WAITALL, 0, &len);
+	char buffer[50] = {0}; 
+	int receive;
+    	socklen_t len = sizeof(server_address);
+    	receive = recvfrom(server_socket, (char*)buffer, sizeof(buffer), MSG_WAITALL, (struct sockaddr*)&server_address, &len);
     
     	// Try to open file
     	FILE* file = fopen(buffer, "r");
     
     	//Print file name
-    	buffer[n] = '\n';
+    	buffer[receive] = '\n';
     	printf("File Name Received: %s", buffer);
     
     	//Did file open succesfully?
     	if (file == NULL)
-        	printf("Failed to open file!\n");
+     		printf("Failed to open file!\n");
     	else
         	perror("File opened successfully!");
     
     	//Send File
     	int EndOfFile = 0; //flag to see if EOF has been reached
     	int sent;
+
+
     	while (1) {
         	//process
-        	for (int i = 0; i < 50; i++){                        //BUFFER 50
+        	for (int i = 0; i < sizeof(buffer); i++){     
             		buffer[i] = fgetc(file);
-            		if (buffer[i] == EOF) EndOfFile = 1;
+            		if (buffer[i] == EOF){
+			       	EndOfFile = 1;
+				break;
+			}
         	}
-        
-        	
-        	/*while (1) { //Loop till client receives file.
-        		//send*/
-        		sent = sendto(server_socket, (const char *)buffer, strlen(buffer), 0, (struct sockaddr*) &server_address, sizeof(server_address));
-        		/*
-        		//wait for confirmation
-        		socklen_t len = 0;
-            		n = recvfrom(server_socket, (char *)buffer, 50, MSG_WAITALL, 0, &len);
-         		//FIXME -- check that the ACK is correct.
-        	}*/
+        	sent = sendto(server_socket, (const char *)buffer, strlen(buffer), 0, (struct sockaddr*) &server_address, len);
             
         //End While
         
@@ -109,21 +106,6 @@ int main(int argc, char *argv[]){
     	if (file != NULL)
         	fclose(file);
 
-	/*
-	//Receive Message from Client
-	char buffer[50] = {0};
-	socklen_t len = 0;                                                                 // Set data length 
-	int receive = recvfrom(server_socket, (char *)buffer, 50, MSG_WAITALL, 0, &len);   // Get data
-	buffer[receive] = '\n';                                                            // Add space to message
-	printf("Message from Client: %s", buffer);                                         // Print Msg
-
-	//Send Message to Client
-	char * server_message = "You reach the server!";                                                             //Data to send
-	int sent = sendto(server_socket, (const char *)server_message, strlen(server_message), 0, (const struct sockaddr*) &server_address, sizeof(server_address));   //Send MSG
-	if(sent != -1)printf("Message Sent!\n");                                                                          //Check sent
-	else perror("Message failed to send");               
-
-	*/
 	//Close Socket
 	close(server_socket);
 

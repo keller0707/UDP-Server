@@ -67,35 +67,14 @@ int main(int argc, char **argv[]){
 	
 	//Receive Message from Server
 	char buffer[200];
-	socklen_t lens = 0;
-	int receive = recv(network_socket, &buffer, sizeof(buffer), 0); 
+	socklen_t len = 0;
+        int receive = recvfrom(network_socket, (char *)buffer, 200, MSG_WAITALL, 0, &len); 
+	//int receive = recv(network_socket, &buffer, sizeof(buffer), 0); 
 	//int receive = recvfrom(network_socket, (char *)buffer, 200, 0, (struct sockaddr *)&server_address, &lens);   //Get data
 	//if(receive == -1) perror("Failed to receive message");
 	//else printf("Received Message\n");
-	buffer[receive] = '\0';                                                            //Add space to message
-	printf("Message: %s", buffer);                                                     //Print Msg
-
-
-	/*
-	//Create Connection
-	int connection_status = connect(network_socket, (struct sockaddr *) &server_address, sizeof(server_address));
-
-	//Check for errors with the connection
-	if(connection_status == -1){
-		perror("Failed to creat connection to the remote socket");
-		exit(EXIT_FAILURE);
-	}//End if*/
-
-	/*
-
-	//Recieve Data from Server
-	char server_response[256];                                            //Store Server Data
-	(struct sockaddr*) &server_address, sizeof(server_address)
-	recv(network_socket, &server_response, sizeof(server_response), 0);   //Recieve Data
-	printf("The server sent the data: %s", server_response);              //Print Data*/
-
-	//Send Data to Server
-	//int 
+        buffer[receive] = '\0';                                                            //Add space to message
+	printf("Message:\n%s", buffer);                                                     //Print Msg 
 
 	
 	//Close the Socket
