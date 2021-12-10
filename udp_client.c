@@ -70,6 +70,8 @@ int main(int argc, char **argv[]){
 	if(receive == -1) perror("Fail to receive package");	                             // Print Error
 	printf("Message:\n%s", buffer);                                                      // Print Message
 
+	//Create File
+	
 	
 	//Close the Socket
 	close(network_socket);
